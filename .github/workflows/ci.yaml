@@ -12,5 +12,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Print message
-        run: echo "CI pipeline is running!"
+      - name: Build Docker image
+        run: docker build -t devops-practice .
