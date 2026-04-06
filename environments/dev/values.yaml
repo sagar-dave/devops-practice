@@ -2,4 +2,4 @@ replicaCount: 1
 
 image:
   repository: sagardave/devops-practice
-  tag: latest
+  tag: dev-v1
