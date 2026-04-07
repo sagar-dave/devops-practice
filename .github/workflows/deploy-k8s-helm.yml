@@ -1,11 +1,12 @@
-name: CI/CD to Kubernetes with Helm
+name: Build Image and Update Dev Values
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-and-update-dev:
+    if: "!contains(github.event.head_commit.message, 'Update dev image tag')"
     runs-on: ubuntu-latest
 
     env:
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -28,21 +31,17 @@ jobs:
       - name: Push Image
         run: docker push $IMAGE_REPOSITORY:$IMAGE_TAG
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-
-      - name: Configure kubeconfig
+      - name: Update dev values.yaml image tag
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
+          sed -i 's|tag: .*|tag: '"$IMAGE_TAG"'|' environments/dev/values.yaml
 
-      - name: Helm Upgrade
-        run: |
-          helm upgrade --install my-app ./devops-app \
-            --set image.repository=$IMAGE_REPOSITORY \
-            --set image.tag=$IMAGE_TAG
+      - name: Show updated dev values
+        run: cat environments/dev/values.yaml
 
-      - name: Verify Rollout
+      - name: Commit updated dev values
         run: |
-          kubectl rollout status deployment/devops-app
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add environments/dev/values.yaml
+          git diff --cached --quiet || git commit -m "Update dev image tag to $IMAGE_TAG"
+          git push
