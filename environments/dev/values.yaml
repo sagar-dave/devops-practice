@@ -2,4 +2,4 @@ replicaCount: 1
 
 image:
   repository: sagardave/devops-practice
-  tag: da3da634216a316522d83c7aadd54f5c2a1d3ec8
+  tag: b0c8cfc4f375c43b7cbc362803b6d72c90516c2e
