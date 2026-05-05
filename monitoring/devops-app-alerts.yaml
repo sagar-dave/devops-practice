@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: devops-app-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: devops-app.rules
+      rules:
+        - alert: DevopsAppHighCPU
+          expr: sum(rate(container_cpu_usage_seconds_total{namespace="dev", pod=~"devops-app.*"}[1m])) > 0.02
+          for: 2m
+          labels:
+            severity: critical
+            app: devops-app
+          annotations:
+            summary: "High CPU usage on DevOps App"
+            description: "CPU usage is above 2% for 2 minutes. Current value: {{ $value }}"
+
+        - alert: DevopsAppHighMemory
+          expr: sum(container_memory_working_set_bytes{namespace="dev", pod=~"devops-app.*", container!="", container!="POD"}) > 30000000
+          for: 2m
+          labels:
+            severity: critical
+            app: devops-app
+          annotations:
+            summary: "High Memory usage on DevOps App"
+            description: "Memory usage is above 30MB for 2 minutes. Current value: {{ $value }}"
+
+        - alert: DevopsAppPodDown
+          expr: kube_deployment_status_replicas_available{namespace="dev", deployment="devops-app"} < 1
+          for: 2m
+          labels:
+            severity: critical
+            app: devops-app
+          annotations:
+            summary: "Pod Down - DevOps App"
+            description: "No available replicas for DevOps App for 2 minutes."

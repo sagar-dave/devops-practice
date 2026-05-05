@@ -16,6 +16,9 @@ spec:
         - name: devops-container
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_ENV
+              value: "{{ .Values.env.APP_ENV }}"
           ports:
             - containerPort: 80
 

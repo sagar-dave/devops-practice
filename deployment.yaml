@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: devops-container
-        image: sagardave/devops-practice:latest
+        image: sagardave/devops-practice:env-v1
         imagePullPolicy: Always
         ports:
         - containerPort: 80
