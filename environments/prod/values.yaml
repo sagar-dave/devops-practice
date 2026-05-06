@@ -2,6 +2,6 @@ replicaCount: 3
 
 image:
   repository: sagardave/devops-practice
-  tag: prod-v1
+  tag: env-v2
 env:
   APP_ENV: PROD
